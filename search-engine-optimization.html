@@ -558,6 +558,48 @@
             }, 3000);
         });
     </script>
+<script>
+    // 初始化折线图
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('trafficChart').getContext('2d');
+        const trafficChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Traffic Growth (%)',
+                    data: [10, 30, 50, 70, 90, 110],
+                    borderColor: '#165DFF',
+                    backgroundColor: 'rgba(22, 93, 255, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
 
