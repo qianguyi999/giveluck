@@ -204,50 +204,92 @@
                 <div class="bg-white p-8 rounded-2xl shadow-xl">
                     <h3 class="text-xl font-bold mb-6 text-center">Performance Growth Metrics</h3>
                     <div class="relative h-80">
-                        <!-- X轴标签 -->
-                        <div class="flex justify-between text-sm text-dark/60 mt-6">
-                            <span>Conversion Rate</span>
-                            <span>ROI</span>
-                            <span>Website Traffic</span>
-                            <span>CTR</span>
-                        </div>
-                        
-                        <!-- 网格线 -->
-                        <div class="absolute inset-0 grid grid-cols-4 gap-4 z-0">
-                            <div class="border-r border-gray-100"></div>
-                            <div class="border-r border-gray-100"></div>
-                            <div class="border-r border-gray-100"></div>
-                            <div></div>
-                        </div>
-                        
-                        <!-- Y轴标签 -->
-                        <div class="absolute left-0 top-0 bottom-0 flex flex-col justify-between py-4 text-xs text-dark/60">
-                            <span>350%</span>
-                            <span>250%</span>
-                            <span>150%</span>
-                            <span>50%</span>
-                            <span>0%</span>
-                        </div>
-                        
-                        <!-- 柱状图 -->
-                        <div class="absolute left-0 right-0 bottom-0 h-[80%] flex items-end justify-between px-4">
-                            <!-- 转化率柱 -->
-                            <div class="w-1/5 relative flex flex-col items-center">
-                                <div class="w-16 bg-primary rounded-t-lg" style="height: 70.57%;"></div>
-                                <div class="mt-2 text-sm font-medium">+247%</div>
-                            </div>
-                            
-                            <!-- ROI柱 -->
-                            <div class="w-1/5 relative flex flex-col items-center">
-                                <div class="w-16 bg-secondary rounded-t-lg" style="height: 54%;"></div>
-                                <div class="mt-2 text-sm font-medium">+189%</div>
-                            </div>
-                            
-                            <!-- 流量柱 -->
-                            <div class="w-1/5 relative flex flex-col items-center">
-                                <div class="w-16 bg-accent rounded-t-lg" style="height: 89.14%;"></div>
-                                <div class="mt-2 text-sm font-medium">+312%</div>
-                            </div>
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const ctx = document.getElementById('performanceChart').getContext('2d');
+                        const performanceChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['Conversion Rate', 'ROI', 'Website Traffic', 'CTR'],
+                                datasets: [{
+                                    label: 'Growth (%)',
+                                    data: [247, 189, 312, 150],
+                                    backgroundColor: [
+                                        '#165DFF',
+                                        '#36CFC9',
+                                        '#722ED1',
+                                        '#165DFF'
+                                    ],
+                                    borderColor: [
+                                        '#165DFF',
+                                        '#36CFC9',
+                                        '#722ED1',
+                                        '#165DFF'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        display: false,
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return '+' + context.raw + '%';
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            callback: function(value) {
+                                                return value + '%';
+                                            }
+                                        }
+                                    }
+                                },
+                                animation: {
+                                    duration: 2000,
+                                    easing: 'easeOutQuart',
+                                    onComplete: function() {
+                                        this.config.data.datasets.forEach(function(dataset) {
+                                            dataset.backgroundColor.forEach(function(color, index) {
+                                                const meta = this.getDatasetMeta(0);
+                                                const element = meta.data[index];
+                                                element.custom = element.custom || {};
+                                                element.custom.originalColor = color;
+                                            }, this);
+                                        }, this);
+                                    },
+                                    onProgress: function(animation) {
+                                        const chartInstance = this;
+                                        const easingFunction = Chart.helpers.easing.easeOutQuart;
+                                        const easedProgress = easingFunction(animation.currentStep / animation.numSteps);
+                                        
+                                        this.config.data.datasets.forEach(function(dataset, i) {
+                                            const meta = chartInstance.getDatasetMeta(i);
+                                            meta.data.forEach(function(bar, index) {
+                                                const originalColor = bar.custom.originalColor;
+                                                const newColor = Chart.helpers.color(originalColor).alpha(easedProgress).rgbString();
+                                                bar.options.backgroundColor = newColor;
+                                                bar.update();
+                                            });
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                    });
+                </script>
                             
                             <!-- CTR柱 -->
                             <div class="w-1/5 relative flex flex-col items-center">
